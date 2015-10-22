@@ -232,7 +232,7 @@ public class ChatServer {
                 	nonce_client = Integer.parseInt(nonce_str);
                     show("Nonce from client: " + nonce_client);
                     // Check nonce is odd
-                    if (nonce_client % 2 == 0 ) {
+                    if (nonce_client % 2 == 0 || nonce_client < nonce_server) {
                     	show("********** AUTH FAILED INCORRECT NONCE ************");
                     } else {
                     	auth = true;
