@@ -35,6 +35,8 @@ public class ChatClient {
     static String IV = "AAAAAAAAAAAAAAAA";  
     int nonce_client = 1;
     static boolean auth =false;
+    static String port;
+    static int portnum;
     
     static SecureRandom rand = new SecureRandom();
     static int client_secret;
@@ -111,6 +113,16 @@ public class ChatClient {
             	}
             }
         });
+    }
+    /**
+     * Prompt for the port number
+     */
+    private String getPortNumber() {
+        return JOptionPane.showInputDialog(
+            frame,
+            "Enter port number:",
+            "port",
+            JOptionPane.QUESTION_MESSAGE);
     }
 
     /**
@@ -202,12 +214,15 @@ public class ChatClient {
     	
         // Make connection and initialize streams
         String serverAddress = getServerAddress();
+        port = getPortNumber();
+        portnum = Integer.parseInt(port);
+        show("Port: " + portnum);
         secretKey = getSecretKey();
         show("Secret key: " + secretKey);
         secretKey = make16Bytes(secretKey);
         show("Secret key is now 16 bytes: " + secretKey);
         
-        Socket socket = new Socket(serverAddress, 9001);
+        Socket socket = new Socket(serverAddress, portnum);
         in = new BufferedInputStream(socket.getInputStream());
         out = new PrintWriter(socket.getOutputStream(), true);        
         

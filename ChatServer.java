@@ -40,7 +40,8 @@ public class ChatServer {
     static Socket socket;
     static BigInteger server_secret_bi;
     static boolean auth = false;
-    private static final int PORT = 9001;
+    static String port;
+    static int portnum;    
 
     static BufferedInputStream in;
     static PrintWriter out;
@@ -124,6 +125,16 @@ public class ChatServer {
         int padlen = Integer.parseInt(deciphered_text.substring(0,2)); // Extract padding length
         return deciphered_text.substring(2, decodedText.length-padlen); //Does not remove delimiters
     }
+    /**
+     * Prompt for the port number
+     */
+    public static String getPortNumber() {
+        return JOptionPane.showInputDialog(
+            frame,
+            "Enter port number:",
+            "port",
+            JOptionPane.QUESTION_MESSAGE);
+    }
     
     // Pad length for 16 bytes
     public static int getPadLen(String plainText) {
@@ -158,23 +169,17 @@ public class ChatServer {
         ChatServer server = new ChatServer();
         server.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         server.frame.setVisible(true);
-        listener = new ServerSocket(PORT);
         
         // Show known values 
         show("Prime: " + primeP.toString(10));
         show("Generator: " + generatorG.toString(10));
+        
         SecureRandom rand = new SecureRandom();
     	int server_secret = rand.nextInt(Integer.MAX_VALUE - 2048) + 2048;
         server_secret_bi = new BigInteger(Integer.toString(server_secret));
         modulus = generatorG.modPow(server_secret_bi, primeP);
         show("Server secret (b) : " + server_secret_bi);
-        show("Server modulus (g^b mod p) : " + modulus);
-        
-        // Get secret key
-        secretKey = getSecretKey();
-        show("Secret key: " + secretKey);
-        secretKey = make16Bytes(secretKey);
-        show("Secret key is now 16 bytes: " + secretKey);        
+        show("Server modulus (g^b mod p) : " + modulus);    
         
         while(true){
         	server.run();
@@ -182,6 +187,20 @@ public class ChatServer {
     }
 
     public void run() throws IOException {
+    	
+    	// Get port number
+        port = getPortNumber();
+        portnum = Integer.parseInt(port);
+        show("Port: " + portnum);
+        
+        listener = new ServerSocket(portnum);
+        
+        // Get secret key
+        secretKey = getSecretKey();
+        show("Secret key: " + secretKey);
+        secretKey = make16Bytes(secretKey);
+        show("Secret key is now 16 bytes: " + secretKey);    
+        
     	// Make connection and initialize streams
         socket = listener.accept();
         
@@ -231,7 +250,8 @@ public class ChatServer {
 
                 	nonce_client = Integer.parseInt(nonce_str);
                     show("Nonce from client: " + nonce_client);
-                    // Check nonce is odd
+                    
+                    // Check nonce is odd and incrementing
                     if (nonce_client % 2 == 0 || nonce_client < nonce_server) {
                     	show("********** AUTH FAILED INCORRECT NONCE ************");
                     } else {
@@ -360,16 +380,17 @@ public class ChatServer {
                 show("Server secret (b) : " + server_secret_bi);
                 show("Server modulus (g^b mod p) : " + modulus);
                 
-                // Prompt for the secret key again for the next client connection
-                secretKey = getSecretKey();
-                show("Secret key: " + secretKey);
-                
-                // Secret key must be 16 bytes for AES
-                secretKey = make16Bytes(secretKey);
-                show("Secret key is now 16 bytes: " + secretKey);
+//                // Prompt for the secret key again for the next client connection
+//                secretKey = getSecretKey();
+//                show("Secret key: " + secretKey);
+//                
+//                // Secret key must be 16 bytes for AES
+//                secretKey = make16Bytes(secretKey);
+//                show("Secret key is now 16 bytes: " + secretKey);
                 in.close();
                 out.close();
                 socket.close();
+                listener.close();
                 return;
                 
 			} catch (FileNotFoundException e1) {
