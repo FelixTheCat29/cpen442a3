@@ -48,7 +48,7 @@ public class ChatClient {
 
     public ChatClient() throws NumberFormatException, IOException {
         // Generate random secret
-    	client_secret = rand.nextInt((Integer.MAX_VALUE - 2) + 1) + 3;
+    	client_secret = rand.nextInt(Integer.MAX_VALUE - 2048) + 2048;
     	client_secret_bi = new BigInteger(Integer.toString(client_secret));
     	
     	// Create file to store odd nonce (which increments)

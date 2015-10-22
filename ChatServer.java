@@ -164,7 +164,7 @@ public class ChatServer {
         show("Prime: " + primeP.toString(10));
         show("Generator: " + generatorG.toString(10));
         SecureRandom rand = new SecureRandom();
-    	int server_secret = rand.nextInt((Integer.MAX_VALUE - 2) + 1) + 3;
+    	int server_secret = rand.nextInt(Integer.MAX_VALUE - 2048) + 2048;
         server_secret_bi = new BigInteger(Integer.toString(server_secret));
         modulus = generatorG.modPow(server_secret_bi, primeP);
         show("Server secret (b) : " + server_secret_bi);
@@ -354,7 +354,7 @@ public class ChatServer {
                 
                 SecureRandom rand = new SecureRandom();
                 rand.setSeed(rand.generateSeed(20));
-            	int server_secret = rand.nextInt((Integer.MAX_VALUE - 2) + 1) + 3;
+            	int server_secret = rand.nextInt(Integer.MAX_VALUE - 2048) + 2048;
                 server_secret_bi = new BigInteger(Integer.toString(server_secret));
                 modulus = generatorG.modPow(server_secret_bi, primeP);
                 show("Server secret (b) : " + server_secret_bi);
